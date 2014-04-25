@@ -13,7 +13,7 @@ public class JSONExpt
     System.out.println("____________________________");
     System.out.println("parseConstant");
     System.out.println("----------------------------");
-
+    System.out.println(JSONUtils.parse ("null"));
     // System.out.println(JSONUtils.parse("null"));
     System.out.println(JSONUtils.parse("false"));
     System.out.println(JSONUtils.parse("true"));
@@ -108,7 +108,7 @@ public class JSONExpt
     System.out.println(JSONUtils.parse("[1,[12,23,545,30000],[20]]"));
     System.out.println(JSONUtils.parse("[{\"a\":[{},{}]},[]]"));
 
-    JSONUtils.parseFile("/home/sivarama/FileTest");
+    JSONUtils.parseFile("/home/schlossb/FileTest");
 
     System.out.println(JSONUtils.parse("\"Hel\u2206lo\""));
     System.out.println("\u2202");
