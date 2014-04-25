@@ -37,17 +37,16 @@ public class JSONUtils
    * @post TBA
    * @throws Exception
    */
-  public static String
-    removeOutsideChars (String str, char first, char last)
-      throws Exception
+  public static String removeOutsideChars(String str, char first, char last)
+    throws Exception
   {
-    if (str.charAt (0) == first && str.charAt (str.length () - 1) == last)
+    if (str.charAt(0) == first && str.charAt(str.length() - 1) == last)
       {
-        return str.substring (1, str.length () - 1);
+        return str.substring(1, str.length() - 1);
       } // if brackets are correct
     else
       // otherwise throw an exception
-      throw new Exception ("Unexpected outside chars around" + str);
+      throw new Exception("Unexpected outside chars around " + str);
   } // removeOutsideChars
 
   /**
@@ -63,23 +62,31 @@ public class JSONUtils
    * @post TBA
    * @throws Exception
    */
-  public static String
-    removeWhiteSpace (String str, int index)
-      throws Exception
+  public static Object[] removeWhiteSpace(String str, int index)
+    throws Exception
   {
     int lastSpace = index;
-    if (str.charAt (lastSpace) != ' ')
-      return str;
+    Object[] output = new Object[2];
+    if (str.charAt(lastSpace) != ' ')
+      {
+        output[0] = str;
+        output[1] = index;
+        return output;
+      }
     else
       {
-        while ((lastSpace < str.length ()) && (str.charAt (lastSpace) == ' '))
+        while ((lastSpace < str.length()) && (str.charAt(lastSpace) == ' '))
           {
             lastSpace++;
           }// while
-        if (lastSpace == str.length ())
-          throw new Exception ("Cannot parse empty strings");
+        if (lastSpace == str.length())
+          throw new Exception("Cannot parse empty strings");
         else
-          return str.substring (lastSpace, str.length ());
+          {
+            output[0] = str.substring(lastSpace, str.length());
+            output[1] = lastSpace;
+            return output;
+          }
       }// else
   }// removeWhiteSpace(String, index)
 
@@ -97,40 +104,39 @@ public class JSONUtils
    * @Pre TBA
    * @Post TBA
    */
-  public static BigDecimal
-    parseInteger (String str)
-      throws Exception
+  public static BigDecimal parseInteger(String str)
+    throws Exception
   {
     try
       {
         char first;
-        if ((first = str.charAt (0)) != '.' && first != '-'
-            && (Character.isDigit (first) == false))
+        if ((first = str.charAt(0)) != '.' && first != '-'
+            && (Character.isDigit(first) == false))
           {
-            throw new Exception ("Input" + str + " is not a proper number");
+            throw new Exception("Input" + str + " is not a proper number");
           } // If char number isn't a number
         // Split the string at e, so if the number is in the form
         // #e# (ie: 12e5 AKA 12 * 10^12), we have an array with the
         // base number and the exponent
-        String[] input = str.split ("e");
+        String[] input = str.split("e");
         // Initialized output and exponent variables
         BigDecimal output = BigDecimal.ZERO;
         int power = 0;
         if (input.length == 1)
           {
-            output = new BigDecimal (input[0]);
+            output = new BigDecimal(input[0]);
           } // If there is no e
         else if (input.length == 2)
           {
-            output = new BigDecimal (input[0]);
-            power = Integer.parseInt (input[1]);
-            output = output.multiply (BigDecimal.TEN.pow (power));
+            output = new BigDecimal(input[0]);
+            power = Integer.parseInt(input[1]);
+            output = output.multiply(BigDecimal.TEN.pow(power));
           } // If there is an e
         return output;
       }
     catch (Exception e)
       {
-        throw new Exception ("Input" + str + " is not a proper number");
+        throw new Exception("Input " + str + " is not a proper number");
       } // if we try to construct a big decimal out of a non-number
 
   } // parseInteger(String)​
@@ -144,56 +150,55 @@ public class JSONUtils
    * @pre TBA
    * @post TBA
    */
-  public static String
-    parseString (String str)
-      throws Exception
+  public static String parseString(String str)
+    throws Exception
   {
-    str = removeOutsideChars (str, '"', '"');
-    StringBuilder parsed = new StringBuilder ();
+    str = removeOutsideChars(str, '"', '"');
+    StringBuilder parsed = new StringBuilder();
     char ch;
     int end = 0;
-    for (int i = 0; i < str.length (); i++)
+    for (int i = 0; i < str.length(); i++)
       {
-        ch = str.charAt (i);
+        ch = str.charAt(i);
         if (ch == '\\')
           {
-            switch (ch = str.charAt (++i))
+            switch (ch = str.charAt(++i))
               {
                 case '"':
                 case '\\':
                 case '/':
-                  parsed.append ((char) ch);
+                  parsed.append((char) ch);
                   break;
                 case 'b':
-                  parsed.append ('\b');
+                  parsed.append('\b');
                   break;
                 case 'f':
-                  parsed.append ('\f');
+                  parsed.append('\f');
                   break;
                 case 'n':
-                  parsed.append ('\n');
+                  parsed.append('\n');
                   break;
                 case 'r':
-                  parsed.append ('\r');
+                  parsed.append('\r');
                   break;
                 case 't':
-                  parsed.append ('\t');
+                  parsed.append('\t');
                   break;
                 case 'u':
-                  parsed.append ('\\');
+                  parsed.append('\\');
                   end = i + 4;
                   while (i < end)
                     {
-                      parsed.append (str.charAt (i));
+                      parsed.append(str.charAt(i));
                       i++;
                     }// while
                 default:
-                  throw new Exception ("Invalid backslash character: \\" + ch);
+                  throw new Exception("Invalid backslash character: \\" + ch);
               } // switch
           } // if backslash
-        parsed.append (ch);
+        parsed.append(ch);
       } // for
-    return parsed.toString ();
+    return parsed.toString();
   }// parseString
 
   /**
@@ -206,13 +211,12 @@ public class JSONUtils
    * @pre TBA
    * @post TBA
    */
-  public static ArrayList<Object>
-    parseArray (String str)
-      throws Exception
+  public static ArrayList<Object> parseArray(String str)
+    throws Exception
   {
-    str = removeOutsideChars (str, '[', ']');
-    ArrayList<Object> output = new ArrayList<Object> ();
-    StringBuilder parsed = new StringBuilder ();
+    str = removeOutsideChars(str, '[', ']');
+    ArrayList<Object> output = new ArrayList<Object>();
+    StringBuilder parsed = new StringBuilder();
     char current;
     // countBrackets tracks the number of brackets encountered when dealing with
     // arrays and objects. When an opening bracket is added, count is
@@ -223,101 +227,101 @@ public class JSONUtils
     int countBrackets = 0;
     // Iterate through str char by char and check first letters to determine
     // type
-    for (int i = 0; i < str.length (); i++)
+    for (int i = 0; i < str.length(); i++)
       {
-        current = str.charAt (i);
+        current = str.charAt(i);
         // if number
-        if ((current == '-') || (Character.isDigit (current)))
+        if ((current == '-') || (Character.isDigit(current)))
           {
             // iterate through value til the end and append
-            while ((i < str.length ())
-                   && (!(str.charAt (i) == ',') && (!(str.charAt (i) == ']'))))
+            while ((i < str.length())
+                   && (!(str.charAt(i) == ',') && (!(str.charAt(i) == ']'))))
               {
-                parsed.append (str.charAt (i));
+                parsed.append(str.charAt(i));
                 i++;
               } // while within the value
             // add the send the parsed value to parseInteger and add it to
             // output
-            output.add (parseInteger (parsed.toString ()));
-            parsed.setLength (0);
+            output.add(parseInteger(parsed.toString()));
+            parsed.setLength(0);
           } // if first char is - or a number
         // if string
         else if (current == '\"')
           {
             // iterate through value til the end and append
-            while ((i < str.length ())
-                   && (!((str.charAt (i) == ',') && (str.charAt (i - 1) == '\"'))))
+            while ((i < str.length())
+                   && (!((str.charAt(i) == ',') && (str.charAt(i - 1) == '\"'))))
               {
-                parsed.append (str.charAt (i));
+                parsed.append(str.charAt(i));
                 i++;
               } // while not at end of value
             // send value to parseString and add to output
-            output.add (parseString (parsed.toString ()));
-            parsed.setLength (0);
+            output.add(parseString(parsed.toString()));
+            parsed.setLength(0);
           }// if first char is a double quote
         // if array
         else if (current == '[')
           {
             // append the opening bracket
-            parsed.append (str.charAt (i));
+            parsed.append(str.charAt(i));
             countBrackets++;
             i++;
             // iterate through the rest of the array
-            while ((i < str.length ()) && (countBrackets != 0))
+            while ((i < str.length()) && (countBrackets != 0))
               {
 
-                if (str.charAt (i) == '[')
+                if (str.charAt(i) == '[')
                   {
                     countBrackets++;
                   } // if opening bracket
-                else if (str.charAt (i) == ']')
+                else if (str.charAt(i) == ']')
                   {
                     countBrackets--;
                   } // if closing bracket
-                parsed.append (str.charAt (i));
+                parsed.append(str.charAt(i));
                 i++;
               }
             // loop ends when countBrackets is reduced to 0, or the input ends
             // send parsed value to parseArray and add to output
-            output.add (parseArray (parsed.toString ()));
-            parsed.setLength (0);
+            output.add(parseArray(parsed.toString()));
+            parsed.setLength(0);
           } // if first char is an opening square bracket
         else if (current == '{')
           {
             // append the opening bracket
-            parsed.append (str.charAt (i));
+            parsed.append(str.charAt(i));
             countBrackets++;
             i++;
             // iterate through the rest of the object
-            while ((i < str.length ()) && (countBrackets != 0))
+            while ((i < str.length()) && (countBrackets != 0))
               {
-                if (str.charAt (i) == '{')
+                if (str.charAt(i) == '{')
                   {
                     countBrackets++;
                   } // if opening {
-                else if (str.charAt (i) == '}')
+                else if (str.charAt(i) == '}')
                   {
                     countBrackets--;
                   } // if closing }
-                parsed.append (str.charAt (i));
+                parsed.append(str.charAt(i));
                 i++;
               } // loop ends when countBrackets is reduced to 0, or the input
                 // ends
             // send parsed value to parseArray and add to output
-            output.add (parseObject (parsed.toString ()));
-            parsed.setLength (0);
+            output.add(parseObject(parsed.toString()));
+            parsed.setLength(0);
           } // if first char is an opening curly bracket
-        else if (Character.isAlphabetic (str.charAt (i)))
+        else if (Character.isAlphabetic(str.charAt(i)))
           {
             // iterate through the constant
-            while ((i < str.length ()) && (!(str.charAt (i) == ',')))
+            while ((i < str.length()) && (!(str.charAt(i) == ',')))
               {
-                parsed.append (str.charAt (i));
+                parsed.append(str.charAt(i));
                 i++;
               } // while in the value
             // send parsed value to parseConstant and append it to the output
-            output.add (parseConstant (parsed.toString ()));
-            parsed.setLength (0);
+            output.add(parseConstant(parsed.toString()));
+            parsed.setLength(0);
           } // if first char is a letter
       } // end parsing
     return output;
@@ -333,36 +337,35 @@ public class JSONUtils
    * @pre TBA
    * @post TBA
    */
-  public static Hashtable<String, Object>
-    parseObject (String str)
-      throws Exception
+  public static Hashtable<String, Object> parseObject(String str)
+    throws Exception
   {
     // remove outside brackets, and initialize temp storage values and bracket
     // count
-    str = removeOutsideChars (str, '{', '}');
-    Hashtable<String, Object> output = new Hashtable<String, Object> ();
+    str = removeOutsideChars(str, '{', '}');
+    Hashtable<String, Object> output = new Hashtable<String, Object>();
     String key = null;
-    StringBuilder parsed = new StringBuilder ();
+    StringBuilder parsed = new StringBuilder();
     char current;
     int countBrackets = 0;
     // iterate through the input
     try
       {
-        for (int i = 0; i < str.length (); i++)
+        for (int i = 0; i < str.length(); i++)
           {
-            current = str.charAt (i);
+            current = str.charAt(i);
             // Find the key
             if (current == '\"')
               {
                 i++;
                 // iterate through the key and store it.
-                while ((i < str.length ()) && (!(str.charAt (i) == '\"')))
+                while ((i < str.length()) && (!(str.charAt(i) == '\"')))
                   {
-                    parsed.append (str.charAt (i));
+                    parsed.append(str.charAt(i));
                     i++;
                   } // while finding key
-                key = parsed.toString ();
-                parsed.setLength (0);
+                key = parsed.toString();
+                parsed.setLength(0);
               } // if double quote
             // if char is a colon
             else if (current == ':')
@@ -370,113 +373,115 @@ public class JSONUtils
                 // skip over it and determine what type of value the next object
                 // is.
                 i++;
+                Object[] hashSpaces = removeWhiteSpace(str, i);
+                i = (int) hashSpaces[1];
                 // if digit
-                if ((str.charAt (i) == '-')
-                    || (Character.isDigit (str.charAt (i))))
+                if ((str.charAt(i) == '-')
+                    || (Character.isDigit(str.charAt(i))))
                   {
                     // find the end of the digit
-                    while ((i < str.length ())
-                           && (!(str.charAt (i) == ',') && (!(str.charAt (i) == ']'))))
+                    while ((i < str.length())
+                           && (!(str.charAt(i) == ',') && (!(str.charAt(i) == ']'))))
                       {
-                        parsed.append (str.charAt (i));
+                        parsed.append(str.charAt(i));
                         i++;
                       } // while within digit
                     // send the digit to parseInteger, and add it to the output.
-                    output.put (key, parseInteger (parsed.toString ()));
+                    output.put(key, parseInteger(parsed.toString()));
                     key = null;
-                    parsed.setLength (0);
+                    parsed.setLength(0);
                   } // if digit
                 // if string
-                else if (str.charAt (i) == '\"')
+                else if (str.charAt(i) == '\"')
                   {
                     // find the end of the string
-                    while ((i < str.length ())
-                           && !((str.charAt (i) == ',') && (str.charAt (i - 1) == '\"')))
+                    while ((i < str.length())
+                           && !((str.charAt(i) == ',') && (str.charAt(i - 1) == '\"')))
                       {
-                        parsed.append (str.charAt (i));
+                        parsed.append(str.charAt(i));
                         i++;
                       } // while within string
                     // send the string to parseString and add it to the output
-                    output.put (key, parseString (parsed.toString ()));
+                    output.put(key, parseString(parsed.toString()));
                     key = null;
-                    parsed.setLength (0);
+                    parsed.setLength(0);
                   } // if string
                 // if array
-                else if (str.charAt (i) == '[')
+                else if (str.charAt(i) == '[')
                   {
                     // add the first bracket, and increment countBrackets
-                    parsed.append (str.charAt (i));
+                    parsed.append(str.charAt(i));
                     countBrackets++;
                     i++;
                     // find the end of the array (at end of string, or when all
                     // brackets have been cancelled out)
-                    while ((i < str.length ()) && (countBrackets != 0))
+                    while ((i < str.length()) && (countBrackets != 0))
                       {
-                        if (str.charAt (i) == '[')
+                        if (str.charAt(i) == '[')
                           {
                             countBrackets++;
                           } // if opening bracket count it
-                        else if (str.charAt (i) == ']')
+                        else if (str.charAt(i) == ']')
                           {
                             countBrackets--;
                           } // if closing bracket decrement count
                         // otherwise add the char to parsed
-                        parsed.append (str.charAt (i));
+                        parsed.append(str.charAt(i));
                         i++;
                       } // while within the array
                     // send the array to parseArray and add it to output
-                    output.put (key, parseArray (parsed.toString ()));
+                    output.put(key, parseArray(parsed.toString()));
                     key = null;
-                    parsed.setLength (0);
+                    parsed.setLength(0);
                   } // if array
                 // if object
-                else if (str.charAt (i) == '{')
+                else if (str.charAt(i) == '{')
                   {
                     // add the first bracket to count and increment
                     // countBrackets
-                    parsed.append (str.charAt (i));
+                    parsed.append(str.charAt(i));
                     countBrackets++;
                     i++;
                     // find the end of the array
-                    while ((i < str.length ()) && (countBrackets != 0))
+                    while ((i < str.length()) && (countBrackets != 0))
                       {
-                        if (str.charAt (i) == '{')
+                        if (str.charAt(i) == '{')
                           {
                             countBrackets++;
                           } // if opening bracket count it
-                        else if (str.charAt (i) == '}')
+                        else if (str.charAt(i) == '}')
                           {
                             countBrackets--;
                           } // if closing bracket decrement count
                         // otherwise add the char to parsed
-                        parsed.append (str.charAt (i));
+                        parsed.append(str.charAt(i));
                         i++;
                       } // while within the array
                     // send the array to parseArray and add to output
-                    output.put (key, parseObject (parsed.toString ()));
+                    output.put(key, parseObject(parsed.toString()));
                     key = null;
-                    parsed.setLength (0);
+                    parsed.setLength(0);
                   } // if array
                 // if Symbolic Constant
-                else if (Character.isAlphabetic (str.charAt (i)))
+                else if (Character.isAlphabetic(str.charAt(i)))
                   {
                     // find the end of the constant
-                    while ((i < str.length ()) && (!(str.charAt (i) == ',')))
+                    while ((i < str.length()) && (!(str.charAt(i) == ',')))
                       {
-                        parsed.append (str.charAt (i));
+                        parsed.append(str.charAt(i));
                         i++;
                       } // while within the constant
                     // send the constant to parseConstant and add it to output
-                    output.put (key, parseConstant (parsed.toString ()));
+                    output.put(key, parseConstant(parsed.toString()));
                     key = null;
-                    parsed.setLength (0);
+                    parsed.setLength(0);
                   } // if object
               } // if after a :
           } // for parsing input
       }
     catch (Exception e)
       {
-        throw new Exception ("Input " + str + " is not a proper object.");
+        throw new Exception("Input " + str + " is not a proper object.");
       }
     return output;
   } // parseArray (String str)
@@ -491,23 +496,22 @@ public class JSONUtils
    * @pre TBA
    * @post TBA
    */
-  public static Object
-    parseConstant (String str)
-      throws Exception
+  public static Boolean parseConstant(String str)
+    throws Exception
   {
     // Determine whether true false or null and return that
-    if (str.equals ("true"))
+    if (str.equals("true"))
       return (true);
-    else if (str.equals ("false"))
+    else if (str.equals("false"))
       return (false);
-    else if (str.equals ("null"))
-      return ("null");
+    else if (str.equals("null"))
+      return (null);
     else
       {
-        throw new Exception (
-                             "Input "
-                                 + str
-                                 + " is not a Symbolic Constant (Improper JSON String)");
+        throw new Exception(
+                            "Input "
+                                + str
+                                + " is not a Symbolic Constant (Improper JSON String)");
       }// else
   } // end parseConstant​
 
@@ -522,36 +526,36 @@ public class JSONUtils
    * @pre TBA
    * @post TBA
    */
-  public static Object
-    parse (String str)
-      throws Exception
+  public static Object parse(String str)
+    throws Exception
   {
-    if (str.length () == 0)
-      throw new Exception ("Cannot parse empty strings");
-    str = removeWhiteSpace (str, 0);
-    char first = str.charAt (0);
+    if (str.length() == 0)
+      throw new Exception("Cannot parse empty strings");
+    Object[] parseSpaces = removeWhiteSpace(str, 0);
+    str = (String) parseSpaces[0];
+    char first = str.charAt(0);
     Object result = null;
     Boolean hasNull = false;
 
-    if ((first == '-') || (Character.isDigit (first)))
+    if ((first == '-') || (Character.isDigit(first)))
       {
-        result = parseInteger (str);
+        result = parseInteger(str);
       } // if JSON string is a Number
     else if (first == '\"')
       {
-        result = parseString (str);
+        result = parseString(str);
       } // if JSON string is a String
     else if (first == '[')
       {
-        result = parseArray (str);
+        result = parseArray(str);
       } // if JSON string is an Array
     else if (first == '{')
       {
-        result = parseObject (str);
+        result = parseObject(str);
       } // if JSON string is an Object
-    else if (Character.isAlphabetic (first))
+    else if (Character.isAlphabetic(first))
       {
-        result = parseConstant (str);
+        result = parseConstant(str);
         if (result == null)
           {
             hasNull = true;
@@ -559,7 +563,7 @@ public class JSONUtils
       } // if JSON string is a Symbolic Constant
     if (result == null && hasNull == false)
       {
-        throw new Exception ("Input " + str + " is not a proper JSON String");
+        throw new Exception("Input " + str + " is not a proper JSON String");
       } // If inputted String is not any of the above
     return result;
   } // parse(String)​
@@ -572,28 +576,27 @@ public class JSONUtils
    *          code
    * @return object, a Java object represented by the JSON input
    **/
-  public static void
-    parseFile (String filename)
-      throws Exception
+  public static void parseFile(String filename)
+    throws Exception
   {
     String line;
-    StringBuilder input = new StringBuilder ();
+    StringBuilder input = new StringBuilder();
     try
       {
-        BufferedReader read = new BufferedReader (new FileReader (filename));
+        BufferedReader read = new BufferedReader(new FileReader(filename));
 
         // get a line from the file
-        while ((line = read.readLine ()) != null)
+        while ((line = read.readLine()) != null)
           {
-            input.append (line);
+            input.append(line);
           } // parse until there are no more lines
         // parse(input.toString());
-        System.out.println (parse (input.toString ()));
-        read.close ();
-      } //try
+        System.out.println(parse(input.toString()));
+        read.close();
+      } // try
     catch (Exception e)
       {
-        throw new Exception ("Inputted file\"" + filename + "\" not found.");
+        throw new Exception("Inputted file\"" + filename + "\" not found.");
       } // catch
 
   } // parse(BufferedReader, String)
@@ -611,11 +614,10 @@ public class JSONUtils
    * @pre TBA
    * @post TBA
    */
-  public static String
-    toBigDecimal (Object obj)
+  public static String toBigDecimal(Object obj)
   {
     BigDecimal number = (BigDecimal) obj;
-    return number.toString ();
+    return number.toString();
   } // toBigDecimal(Object obj)
 
   /**
@@ -627,8 +629,7 @@ public class JSONUtils
    * @pre TBA
    * @post TBA
    */
-  public static String
-    toStr (Object obj)
+  public static String toStr(Object obj)
   {
     String input = (String) obj;
     return "\"" + input + "\"";
@@ -643,12 +644,11 @@ public class JSONUtils
    * @pre TBA
    * @post TBA
    */
-  public static String
-    toArrayList (Object obj)
+  public static String toArrayList(Object obj)
   {
     String input = "[";
     ArrayList<?> arr = (ArrayList<?>) obj;
-    Object[] values = arr.toArray ();
+    Object[] values = arr.toArray();
     // Iterate through the array til no more elements
     for (int i = 0; i < values.length; i++)
       {
@@ -656,23 +656,23 @@ public class JSONUtils
         // String
         if (values[i] instanceof BigDecimal)
           {
-            values[i] = toBigDecimal (values[i]);
+            values[i] = toBigDecimal(values[i]);
           }
         // if next value is a String, call procedure to convert to JSON String
         else if (values[i] instanceof String)
           {
-            values[i] = toStr (values[i]);
+            values[i] = toStr(values[i]);
           }
         // if next value is an Array, recursively call procedure to convert to
         // JSON String
         else if (values[i] instanceof ArrayList<?>)
           {
-            values[i] = toArrayList (values[i]);
+            values[i] = toArrayList(values[i]);
           }
         // if next value is an Object, call procedure to convert to JSON String
         else if (values[i] instanceof Hashtable<?, ?>)
           {
-            values[i] = toHash (values[i]);
+            values[i] = toHash(values[i]);
           }
         // Add last element
         if (i == values.length - 1)
@@ -695,8 +695,7 @@ public class JSONUtils
    * @pre TBA
    * @post TBA
    */
-  public static String
-    toHash (Object obj)
+  public static String toHash(Object obj)
   {
     // Initialize current key, value, hash table, and enumeration to
     // check if we have more in the table.
@@ -705,44 +704,44 @@ public class JSONUtils
     Object key;
     @SuppressWarnings("unchecked")
     Hashtable<String, Object> hash = (Hashtable<String, Object>) obj;
-    Enumeration<String> keys = Collections.enumeration (hash.keySet ());
-    Enumeration<Object> values = Collections.enumeration (hash.values ());
+    Enumeration<String> keys = Collections.enumeration(hash.keySet());
+    Enumeration<Object> values = Collections.enumeration(hash.values());
     // Loop through hashtable while there is more in it
-    while (keys.hasMoreElements ())
+    while (keys.hasMoreElements())
       {
         // Set key to next key
-        key = toStr (keys.nextElement ());
+        key = toStr(keys.nextElement());
         // add to output
         input = input + key + ":";
         // Set value to next value
-        value = values.nextElement ();
+        value = values.nextElement();
         // if value is a number
         if (value instanceof BigDecimal)
           {
-            value = toBigDecimal (value);
+            value = toBigDecimal(value);
             input = input + value + ",";
           }// add it to the output
         // if value is a String
         else if (value instanceof String)
           {
-            value = toStr (value);
+            value = toStr(value);
             input = input + value + ",";
           }// add it to the output
         // if value is an array
         else if (value instanceof ArrayList<?>)
           {
-            value = toArrayList (value);
+            value = toArrayList(value);
             input = input + value + ",";
           }// add it to the output
         // if value is another array
         else if (value instanceof Hashtable<?, ?>)
           {
-            value = toHash (value);
+            value = toHash(value);
             input = input + value + ",";
           }// add it to the output
       } // end Parsing hashTable
     // remove extraneous comma at end of output and add end brace
-    input = input.substring (0, input.length () - 1);
+    input = input.substring(0, input.length() - 1);
     input = input + "}";
     return input;
   } // toHash (Object obj)
@@ -756,8 +755,7 @@ public class JSONUtils
    * @pre TBA
    * @post TBA
    */
-  public static String
-    toConstant (Object obj)
+  public static String toConstant(Object obj)
   {
     // figure out what constant it is
     String result;
@@ -779,35 +777,34 @@ public class JSONUtils
    *              If the object cannot be converted, e.g., if it does not
    *              correspond to something created by parse.
    */
-  public static String
-    toJSONString (Object obj)
+  public static String toJSONString(Object obj)
   {
     String output = null;
     // Determine what the object we're dealing with is
     // if number, call the toBigDecimal
     if (obj instanceof BigDecimal)
       {
-        return toBigDecimal (obj);
+        return toBigDecimal(obj);
       } // if Number
     // if a string, call toStr
     else if (obj instanceof String)
       {
-        return toStr (obj);
+        return toStr(obj);
       } // if String
     // if an Array, call toArrayList
     else if (obj instanceof ArrayList<?>)
       {
-        return toArrayList (obj);
+        return toArrayList(obj);
       } // if Array
     // if a Hashtable, call toHash
     else if (obj instanceof Hashtable<?, ?>)
       {
-        return toHash (obj);
+        return toHash(obj);
       } // if Hash (object)
     // if a symbolic constant, call toConstant
     else if (obj instanceof Boolean)
       {
-        return toConstant (obj);
+        return toConstant(obj);
       } // if constant
 
     return output;
@@ -823,16 +820,14 @@ public class JSONUtils
    * @pre TBA
    * @post TBA
    */
-  public static void
-    iParser ()
-      throws Exception
+  public static void iParser()
+    throws Exception
   {
     java.io.BufferedReader eyes;
-    eyes = new java.io.BufferedReader (
-                                       new java.io.InputStreamReader (System.in));
+    eyes = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
 
     java.io.PrintWriter pen;
-    pen = new java.io.PrintWriter (System.out, true);
+    pen = new java.io.PrintWriter(System.out, true);
     String input = null;
     String value = null;
     Object result = null;
@@ -841,52 +836,52 @@ public class JSONUtils
 
     while (true)
       {
-        pen.println ("Enter the Object you would like to build: ");
-        pen.print ("[Options: ");
-        pen.println ("Integer, String, Array, Object, Constant]");
-        pen.print ("[Other Available Commands: ");
-        pen.println ("Quit, Print]");
+        pen.println("Enter the Object you would like to build: ");
+        pen.print("[Options: ");
+        pen.println("Integer, String, Array, Object, Constant]");
+        pen.print("[Other Available Commands: ");
+        pen.println("Quit, Print]");
 
-        input = eyes.readLine ();
-        if (input.equalsIgnoreCase ("Quit"))
+        input = eyes.readLine();
+        if (input.equalsIgnoreCase("Quit"))
           {
             break;
           }// if
-        else if (input.equalsIgnoreCase ("Print"))
+        else if (input.equalsIgnoreCase("Print"))
           {
-            pen.print ("[ ");
+            pen.print("[ ");
             for (int i = 0; i < index; i++)
               {
-                pen.print (values[i] + " ");
+                pen.print(values[i] + " ");
               }// for
-            pen.println ("]");
+            pen.println("]");
           }// else if
         else
           {
-            pen.println ("Enter the JSONString: ");
-            value = eyes.readLine ();
+            pen.println("Enter the JSONString: ");
+            value = eyes.readLine();
             try
               {
                 switch (input)
                   {
                     case "Integer":
-                      result = parseInteger (value);
+                      result = parseInteger(value);
                       values[index] = result;
                       break;
                     case "String":
-                      result = parseString (value);
+                      result = parseString(value);
                       values[index] = result;
                       break;
                     case "Array":
-                      result = parseArray (value);
+                      result = parseArray(value);
                       values[index] = result;
                       break;
                     case "Object":
-                      result = parseObject (value);
+                      result = parseObject(value);
                       values[index] = result;
                       break;
                     case "Constant":
-                      result = parseConstant (value);
+                      result = parseConstant(value);
                       values[index] = result;
                       break;
                   }
@@ -896,13 +891,13 @@ public class JSONUtils
               }// try
             catch (Exception e)
               {
-                pen.println ("Your string was incorrectly formatted, please try again.");
+                pen.println("Your string was incorrectly formatted, please try again.");
               }// catch
-            pen.println ("\tResult = " + result);
+            pen.println("\tResult = " + result);
             result = null;
           }// else
       }// while
-    eyes.close ();
+    eyes.close();
     return;
   }// iParser()
 }// class JSONUtils()

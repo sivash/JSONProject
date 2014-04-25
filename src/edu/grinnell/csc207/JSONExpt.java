@@ -13,7 +13,7 @@ public class JSONExpt
     System.out.println("____________________________");
     System.out.println("parseConstant");
     System.out.println("----------------------------");
-    System.out.println(JSONUtils.parse ("null"));
+    System.out.println(JSONUtils.parse("null"));
     // System.out.println(JSONUtils.parse("null"));
     System.out.println(JSONUtils.parse("false"));
     System.out.println(JSONUtils.parse("true"));
@@ -23,7 +23,7 @@ public class JSONExpt
     System.out.println("----------------------------");
 
     System.out.println(JSONUtils.parse(" 4"));
-    System.out.println(JSONUtils.parse("-11.23"));
+    System.out.println(JSONUtils.parse("      -11.23"));
     System.out.println(JSONUtils.parse("    2e2"));
 
     System.out.println("____________________________");
@@ -36,8 +36,8 @@ public class JSONExpt
     System.out.println("parseArray");
     System.out.println("----------------------------");
 
-    System.out.println(JSONUtils.parse("[ [20,30,40]]"));
-    System.out.println(JSONUtils.parse("[]"));
+    System.out.println(JSONUtils.parse("[[20,30,40]]"));
+    System.out.println(JSONUtils.parse("[ ]"));
     System.out.println(JSONUtils.parse("[20]"));
     System.out.println(JSONUtils.parse("[1,[12,[23],[],545,30000],545]"));
     System.out.println(JSONUtils.parse("[212,\"ASHWIN\",3e2]"));
@@ -56,7 +56,7 @@ public class JSONExpt
     System.out.println((JSONUtils.parse("{\"Words\":[\"Hello\"]}")).toString());
     System.out.println((JSONUtils.parse("{\"Ages\":[2,3,4,2e1]}")).toString());
 
-    System.out.println((JSONUtils.parse("{\"Department\":\"CSC\",\"Number\":207,\"Prof\":"
+    System.out.println((JSONUtils.parse("{\"Department\":     \"CSC\",\"Number\":207,\"Prof\":"
                                         + "{\"LName\":\"Rebelsky\",\"FName\":\"Sam\"}}")).toString());
     System.out.println((JSONUtils.parse("{\"Constant\":false}")).toString());
     System.out.println(JSONUtils.parse("[[212,\"a\",{\"ids\":[32,20]}],true]"));
@@ -108,13 +108,16 @@ public class JSONExpt
     System.out.println(JSONUtils.parse("[1,[12,23,545,30000],[20]]"));
     System.out.println(JSONUtils.parse("[{\"a\":[{},{}]},[]]"));
 
-    JSONUtils.parseFile("/home/schlossb/FileTest");
+    JSONUtils.parseFile("/home/sivarama/FileTest");
 
     System.out.println(JSONUtils.parse("\"Hel\u2206lo\""));
     System.out.println("\u2202");
     System.out.println(JSONUtils.parse("\"Hell,lo\""));
 
-    String test3 = " ";
+    System.out.println((JSONUtils.parse("     {\"Department\":    \"CSC\",\"Number\":   207,\"Prof\":"
+                                        + "{\"LName\":    \"Rebelsky\",\"FName\":     \"Sam\"}}")).toString());
+
+    System.out.println(JSONUtils.parse("[1, [12,[23],[],545,30000], 545]"));
 
   }// main
 }// class JSONExpt
