@@ -22,14 +22,15 @@ public class JSONExpt
     System.out.println("parseInteger");
     System.out.println("----------------------------");
 
+    System.out.println(JSONUtils.parse(" 4"));
     System.out.println(JSONUtils.parse("-11.23"));
-    System.out.println(JSONUtils.parse("2e2"));
+    System.out.println(JSONUtils.parse("    2e2"));
 
     System.out.println("____________________________");
     System.out.println("parseString");
     System.out.println("----------------------------");
 
-    System.out.println(JSONUtils.parse("\"Hello\""));
+    System.out.println(JSONUtils.parse("    \"Hello\""));
 
     System.out.println("____________________________");
     System.out.println("parseArray");
@@ -112,5 +113,8 @@ public class JSONExpt
     System.out.println(JSONUtils.parse("\"Hel\u2206lo\""));
     System.out.println("\u2202");
     System.out.println(JSONUtils.parse("\"Hell,lo\""));
+
+    String test3 = " ";
+
   }// main
 }// class JSONExpt

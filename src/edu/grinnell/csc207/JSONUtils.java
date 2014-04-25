@@ -46,8 +46,40 @@ public class JSONUtils
       } // if brackets are correct
     else
       // otherwise throw an exception
-      throw new Exception("Unexpected Outside chars around" + str);
-  } // removeOutsideChars​
+      throw new Exception("Unexpected outside chars around" + str);
+  } // removeOutsideChars
+
+  /**
+   * removeWhiteSpace removes the whitespace starting from a given index until
+   * the end of consecutive whitespace characters in the string
+   * 
+   * @param str
+   *          , a string
+   * @param index
+   *          , an int
+   * @return str without consecutive whitespace starting from index
+   * @pre TBA
+   * @post TBA
+   * @throws Exception
+   */
+  public static String removeWhiteSpace(String str, int index)
+    throws Exception
+  {
+    int lastSpace = index;
+    if (str.charAt(lastSpace) != ' ')
+      return str;
+    else
+      {
+        while ((lastSpace < str.length()) && (str.charAt(lastSpace) == ' '))
+          {
+            lastSpace++;
+          }// while
+        if (lastSpace == str.length())
+          throw new Exception("Cannot parse empty strings");
+        else
+          return str.substring(lastSpace, str.length());
+      }// else
+  }// removeWhiteSpace(String, index)
 
   /*
    * --------JSON String -> Java Object Methods--------
@@ -150,7 +182,7 @@ public class JSONUtils
                     {
                       parsed.append(str.charAt(i));
                       i++;
-                    }
+                    }// while
                 default:
                   throw new Exception("Invalid backslash character: \\" + ch);
               } // switch
@@ -432,7 +464,7 @@ public class JSONUtils
     else
       {
         throw new Exception("Input " + str + " is not a proper JSON String");
-      }
+      }// else
   } // end parseConstant​
 
   /**
@@ -449,6 +481,9 @@ public class JSONUtils
   public static Object parse(String str)
     throws Exception
   {
+    if (str.length() == 0)
+      throw new Exception("Cannot parse empty strings");
+    str = removeWhiteSpace(str, 0);
     char first = str.charAt(0);
     Object result = null;
     Boolean hasNull = false;
@@ -721,7 +756,8 @@ public class JSONUtils
    * iParser
    * 
    * Guides the user through making an object from a JSONString and prints the
-   * returned object
+   * returned object. Useful for testing specific sets of strings without having
+   * to print them manually
    * 
    * @pre TBA
    * @post TBA
