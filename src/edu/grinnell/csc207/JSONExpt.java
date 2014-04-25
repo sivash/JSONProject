@@ -14,7 +14,7 @@ public class JSONExpt
     System.out.println("parseConstant");
     System.out.println("----------------------------");
 
-    System.out.println(JSONUtils.parse("null"));
+    // System.out.println(JSONUtils.parse("null"));
     System.out.println(JSONUtils.parse("false"));
     System.out.println(JSONUtils.parse("true"));
 
@@ -35,6 +35,7 @@ public class JSONExpt
     System.out.println("parseArray");
     System.out.println("----------------------------");
 
+    System.out.println(JSONUtils.parse("[ [20,30,40]]"));
     System.out.println(JSONUtils.parse("[]"));
     System.out.println(JSONUtils.parse("[20]"));
     System.out.println(JSONUtils.parse("[1,[12,[23],[],545,30000],545]"));
@@ -58,7 +59,7 @@ public class JSONExpt
                                         + "{\"LName\":\"Rebelsky\",\"FName\":\"Sam\"}}")).toString());
     System.out.println((JSONUtils.parse("{\"Constant\":false}")).toString());
     System.out.println(JSONUtils.parse("[[212,\"a\",{\"ids\":[32,20]}],true]"));
-    System.out.println(JSONUtils.parse("{\"a\":[],\"b\":[]}"));
+    System.out.println(JSONUtils.parse("{\"a\":{\"c\":true},\"b\":[true,20]}"));
 
     System.out.println("____________________________");
     System.out.println("toString Tests");
@@ -108,5 +109,8 @@ public class JSONExpt
 
     JSONUtils.parseFile("/home/sivarama/FileTest");
 
+    System.out.println(JSONUtils.parse("\"Hel\u2206lo\""));
+    System.out.println("\u2202");
+    System.out.println(JSONUtils.parse("\"Hell,lo\""));
   }// main
 }// class JSONExpt

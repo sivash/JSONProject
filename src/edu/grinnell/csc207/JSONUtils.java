@@ -59,30 +59,46 @@ public class JSONUtils
    * @param str
    *          , a string of JSON
    * @return BigDecimal, the number represented by Str
+   * @throws Exception
    * @Pre TBA
    * @Post TBA
    */
   public static BigDecimal parseInteger(String str)
+    throws Exception
   {
-    // Split the string at e, so if the number is in the form
-    // #e# (ie: 12e5 AKA 12 * 10^12), we have an array with the
-    // base number and the exponent
-    String[] input = str.split("e");
-    // Initialized output and exponent variables
-    BigDecimal output = BigDecimal.ZERO;
-    int power = 0;
-    if (input.length == 1)
+    try
       {
-        output = new BigDecimal(input[0]);
-      } // If there is no e
-    else if (input.length == 2)
+        char first;
+        if ((first = str.charAt(0)) != '.' && first != '-'
+            && (Character.isDigit(first) == false))
+          {
+            throw new Exception("Input" + str + " is not a proper number");
+          } // If char number isn't a number
+        // Split the string at e, so if the number is in the form
+        // #e# (ie: 12e5 AKA 12 * 10^12), we have an array with the
+        // base number and the exponent
+        String[] input = str.split("e");
+        // Initialized output and exponent variables
+        BigDecimal output = BigDecimal.ZERO;
+        int power = 0;
+        if (input.length == 1)
+          {
+            output = new BigDecimal(input[0]);
+          } // If there is no e
+        else if (input.length == 2)
+          {
+            output = new BigDecimal(input[0]);
+            power = Integer.parseInt(input[1]);
+            output = output.multiply(BigDecimal.TEN.pow(power));
+          } // If there is an e
+        return output;
+      }
+    catch (Exception e)
       {
-        output = new BigDecimal(input[0]);
-        power = Integer.parseInt(input[1]);
-        output = output.multiply(BigDecimal.TEN.pow(power));
-      } // If there is an e
-    return output;
-  } // parseInteger(String)
+        throw new Exception("Input" + str + " is not a proper number");
+      } // if we try to construct a big decimal out of a non-number
+
+  } // parseInteger(String)​
 
   /**
    * parseString
@@ -99,6 +115,7 @@ public class JSONUtils
     str = removeOutsideChars(str, '"', '"');
     StringBuilder parsed = new StringBuilder();
     char ch;
+    int end = 0;
     for (int i = 0; i < str.length(); i++)
       {
         ch = str.charAt(i);
@@ -127,14 +144,19 @@ public class JSONUtils
                   parsed.append('\t');
                   break;
                 case 'u':
-                  throw new Exception("Unicode unsupported");
+                  parsed.append('\\');
+                  end = i + 4;
+                  while (i < end)
+                    {
+                      parsed.append(str.charAt(i));
+                      i++;
+                    }
                 default:
                   throw new Exception("Invalid backslash character: \\" + ch);
               } // switch
           } // if backslash
         parsed.append(ch);
       } // for
-
     return parsed.toString();
   }// parseString
 
@@ -155,88 +177,114 @@ public class JSONUtils
     ArrayList<Object> output = new ArrayList<Object>();
     StringBuilder parsed = new StringBuilder();
     char current;
+    // countBrackets tracks the number of brackets encountered when dealing with
+    // arrays and objects. When an opening bracket is added, count is
+    // incremented. When a
+    // closing bracket is encountered, countBrackets is decremented
+    // when countBrackets reaches zero before the end of the input, we know
+    // brackets match up.
     int countBrackets = 0;
+    // Iterate through str char by char and check first letters to determine
+    // type
     for (int i = 0; i < str.length(); i++)
       {
         current = str.charAt(i);
+        // if number
         if ((current == '-') || (Character.isDigit(current)))
           {
+            // iterate through value til the end and append
             while ((i < str.length())
                    && (!(str.charAt(i) == ',') && (!(str.charAt(i) == ']'))))
               {
                 parsed.append(str.charAt(i));
                 i++;
-              }
+              } // while within the value
+            // add the send the parsed value to parseInteger and add it to
+            // output
             output.add(parseInteger(parsed.toString()));
             parsed.setLength(0);
-          }
+          } // if first char is - or a number
+        // if string
         else if (current == '\"')
           {
-            parsed.append(str.charAt(i));
-            i++;
-            while ((i < str.length()) && (!(str.charAt(i) == ',')))
+            // iterate through value til the end and append
+            while ((i < str.length())
+                   && (!((str.charAt(i) == ',') && (str.charAt(i - 1) == '\"'))))
               {
                 parsed.append(str.charAt(i));
                 i++;
-              }
+              } // while not at end of value
+            // send value to parseString and add to output
             output.add(parseString(parsed.toString()));
             parsed.setLength(0);
-          }
+          }// if first char is a double quote
+        // if array
         else if (current == '[')
           {
+            // append the opening bracket
             parsed.append(str.charAt(i));
             countBrackets++;
             i++;
+            // iterate through the rest of the array
             while ((i < str.length()) && (countBrackets != 0))
               {
+
                 if (str.charAt(i) == '[')
                   {
                     countBrackets++;
-                  }
+                  } // if opening bracket
                 else if (str.charAt(i) == ']')
                   {
                     countBrackets--;
-                  }
+                  } // if closing bracket
                 parsed.append(str.charAt(i));
                 i++;
               }
+            // loop ends when countBrackets is reduced to 0, or the input ends
+            // send parsed value to parseArray and add to output
             output.add(parseArray(parsed.toString()));
             parsed.setLength(0);
-          }
+          } // if first char is an opening square bracket
         else if (current == '{')
           {
+            // append the opening bracket
             parsed.append(str.charAt(i));
             countBrackets++;
             i++;
+            // iterate through the rest of the object
             while ((i < str.length()) && (countBrackets != 0))
               {
                 if (str.charAt(i) == '{')
                   {
                     countBrackets++;
-                  }
+                  } // if opening {
                 else if (str.charAt(i) == '}')
                   {
                     countBrackets--;
-                  }
+                  } // if closing }
                 parsed.append(str.charAt(i));
                 i++;
-              }
+              } // loop ends when countBrackets is reduced to 0, or the input
+                // ends
+            // send parsed value to parseArray and add to output
             output.add(parseObject(parsed.toString()));
             parsed.setLength(0);
-          }
+          } // if first char is an opening curly bracket
         else if (Character.isAlphabetic(str.charAt(i)))
           {
-            while ((i < str.length()) && (!(str.charAt(i) == ']')))
+            // iterate through the constant
+            while ((i < str.length()) && (!(str.charAt(i) == ',')))
               {
                 parsed.append(str.charAt(i));
                 i++;
-              }
+              } // while in the value
+            // send parsed value to parseConstant and append it to the output
             output.add(parseConstant(parsed.toString()));
             parsed.setLength(0);
-          }
-      }
+          } // if first char is a letter
+      } // end parsing
     return output;
-  } // end parseArray
+  } // end parseArray​
 
   /**
    * parseObject
@@ -347,7 +395,7 @@ public class JSONUtils
               }
             else if (Character.isAlphabetic(str.charAt(i)))
               {
-                while ((i < str.length()) && (!(str.charAt(i) == ']')))
+                while ((i < str.length()) && (!(str.charAt(i) == ',')))
                   {
                     parsed.append(str.charAt(i));
                     i++;
@@ -367,21 +415,25 @@ public class JSONUtils
    * @param str
    *          , a String of JSON code
    * @return Boolean, either true, false, or null
+   * @throws Exception
    * @pre TBA
    * @post TBA
    */
   public static Boolean parseConstant(String str)
+    throws Exception
   {
     // Determine whether true false or null and return that
-    Boolean value = null;
     if (str.equals("true"))
-      value = true;
+      return (true);
     else if (str.equals("false"))
-      value = false;
+      return (false);
     else if (str.equals("null"))
-      return value;
-    return value;
-  } // end parseConstant
+      return (null);
+    else
+      {
+        throw new Exception("Input " + str + " is not a proper JSON String");
+      }
+  } // end parseConstant​
 
   /**
    * Parse a JSON string and return an object that corresponds to the value
@@ -398,29 +450,39 @@ public class JSONUtils
     throws Exception
   {
     char first = str.charAt(0);
+    Object result = null;
+    Boolean hasNull = false;
 
     if ((first == '-') || (Character.isDigit(first)))
       {
-        return parseInteger(str);
+        result = parseInteger(str);
       } // if JSON string is a Number
     else if (first == '\"')
       {
-        return parseString(str);
+        result = parseString(str);
       } // if JSON string is a String
     else if (first == '[')
       {
-        return parseArray(str);
+        result = parseArray(str);
       } // if JSON string is an Array
     else if (first == '{')
       {
-        return parseObject(str);
+        result = parseObject(str);
       } // if JSON string is an Object
     else if (Character.isAlphabetic(first))
       {
-        return parseConstant(str);
+        result = parseConstant(str);
+        if (result == null)
+          {
+            hasNull = true;
+          }
       } // if JSON string is a Symbolic Constant
-    return str;
-  } // parse(String)
+    if (result == null && hasNull == false)
+      {
+        throw new Exception("Input " + str + " is not a proper JSON String");
+      } // If inputted String is not any of the above
+    return result;
+  } // parse(String)​
 
   /**
    * parse Parses JSON from a file
@@ -651,6 +713,97 @@ public class JSONUtils
       {
         return toConstant(obj);
       } // if constant
+
     return output;
   } // toJSONString(Object)
+
+  /**
+   * iParser
+   * 
+   * Guides the user through making an object from a JSONString and prints the
+   * returned object
+   * 
+   * @pre TBA
+   * @post TBA
+   */
+  public static void iParser()
+    throws Exception
+  {
+    java.io.BufferedReader eyes;
+    eyes = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
+
+    java.io.PrintWriter pen;
+    pen = new java.io.PrintWriter(System.out, true);
+    String input = null;
+    String value = null;
+    Object result = null;
+    Object[] values = new Object[5];
+    int index = 0;
+
+    while (true)
+      {
+        pen.println("Enter the Object you would like to build: ");
+        pen.print("[Options: ");
+        pen.println("Integer, String, Array, Object, Constant]");
+        pen.print("[Other Available Commands: ");
+        pen.println("Quit, Print]");
+
+        input = eyes.readLine();
+        if (input.equalsIgnoreCase("Quit"))
+          {
+            break;
+          }// if
+        else if (input.equalsIgnoreCase("Print"))
+          {
+            pen.print("[ ");
+            for (int i = 0; i < index; i++)
+              {
+                pen.print(values[i] + " ");
+              }// for
+            pen.println("]");
+          }// else if
+        else
+          {
+            pen.println("Enter the JSONString: ");
+            value = eyes.readLine();
+            try
+              {
+                switch (input)
+                  {
+                    case "Integer":
+                      result = parseInteger(value);
+                      values[index] = result;
+                      break;
+                    case "String":
+                      result = parseString(value);
+                      values[index] = result;
+                      break;
+                    case "Array":
+                      result = parseArray(value);
+                      values[index] = result;
+                      break;
+                    case "Object":
+                      result = parseObject(value);
+                      values[index] = result;
+                      break;
+                    case "Constant":
+                      result = parseConstant(value);
+                      values[index] = result;
+                      break;
+                  }
+                index++;
+                if (index > 4)
+                  index = 0;
+              }// try
+            catch (Exception e)
+              {
+                pen.println("Your string was incorrectly formatted, please try again.");
+              }// catch
+            pen.println("\tResult = " + result);
+            result = null;
+          }// else
+      }// while
+    eyes.close();
+    return;
+  }// iParser()
 }// class JSONUtils()
