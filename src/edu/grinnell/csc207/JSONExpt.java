@@ -36,9 +36,11 @@ public class JSONExpt
     System.out.println("----------------------------");
 
     System.out.println(JSONUtils.parse("[]"));
-    System.out.println(JSONUtils.parse("[1,[12,23,545,30000],545]"));
+    System.out.println(JSONUtils.parse("[20]"));
+    System.out.println(JSONUtils.parse("[1,[12,[23],[],545,30000],545]"));
     System.out.println(JSONUtils.parse("[212,\"ASHWIN\",3e2]"));
     System.out.println(JSONUtils.parse("[212,\"HELLO\",3e2,[3000]]"));
+    System.out.println("--------");
     System.out.println(JSONUtils.parse("[[212,\"a\",{\"id\":32}],546]"));
     System.out.println(JSONUtils.parse("[[212,\"a\",{\"ids\":[32,20]}],true]"));
 
@@ -55,6 +57,8 @@ public class JSONExpt
     System.out.println((JSONUtils.parse("{\"Department\":\"CSC\",\"Number\":207,\"Prof\":"
                                         + "{\"LName\":\"Rebelsky\",\"FName\":\"Sam\"}}")).toString());
     System.out.println((JSONUtils.parse("{\"Constant\":false}")).toString());
+    System.out.println(JSONUtils.parse("[[212,\"a\",{\"ids\":[32,20]}],true]"));
+    System.out.println(JSONUtils.parse("{\"a\":[],\"b\":[]}"));
 
     System.out.println("____________________________");
     System.out.println("toString Tests");
@@ -67,7 +71,7 @@ public class JSONExpt
     BigDecimal input = (BigDecimal) JSONUtils.parse("2e2");
     System.out.println(JSONUtils.toJSONString(input));
 
-    input = BigDecimal.valueOf(5000);
+    input = BigDecimal.valueOf(2.2);
     System.out.println(JSONUtils.toJSONString(input));
 
     System.out.println();
@@ -99,5 +103,10 @@ public class JSONExpt
 
     System.out.println(JSONUtils.toJSONString(hashTest));
     System.out.println(JSONUtils.toJSONString(false));
+    System.out.println(JSONUtils.parse("[1,[12,23,545,30000],[20]]"));
+    System.out.println(JSONUtils.parse("[{\"a\":[{},{}]},[]]"));
+
+    JSONUtils.parseFile("/home/sivarama/FileTest");
+
   }// main
 }// class JSONExpt

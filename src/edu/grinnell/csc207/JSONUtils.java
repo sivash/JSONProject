@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.io.BufferedReader;
+import java.io.FileReader;
+import java.lang.StringBuilder;
 
 /**
  * @authors Ashwin Sivaramakrishnan
@@ -19,6 +21,33 @@ import java.io.BufferedReader;
  */
 public class JSONUtils
 {
+
+  /**
+   * removeOutsideChars removes the characters surrounding a string, if they
+   * match the inputted first and last chars.
+   * 
+   * @param str
+   *          , a string
+   * @param first
+   *          , a char
+   * @param last
+   *          , a char
+   * @return str without outside characters
+   * @pre TBA
+   * @post TBA
+   * @throws Exception
+   */
+  public static String removeOutsideChars(String str, char first, char last)
+    throws Exception
+  {
+    if (str.charAt(0) == first && str.charAt(str.length() - 1) == last)
+      {
+        return str.substring(1, str.length() - 1);
+      } // if brackets are correct
+    else
+      // otherwise throw an exception
+      throw new Exception("Unexpected Outside chars around" + str);
+  } // removeOutsideChars​
 
   /*
    * --------JSON String -> Java Object Methods--------
@@ -65,9 +94,48 @@ public class JSONUtils
    * @post TBA
    */
   public static String parseString(String str)
+    throws Exception
   {
-    // Return the inputted string minus the surrounding quotes.
-    return str.substring(1, (str.length() - 1));
+    str = removeOutsideChars(str, '"', '"');
+    StringBuilder parsed = new StringBuilder();
+    char ch;
+    for (int i = 0; i < str.length(); i++)
+      {
+        ch = str.charAt(i);
+        if (ch == '\\')
+          {
+            switch (ch = str.charAt(++i))
+              {
+                case '"':
+                case '\\':
+                case '/':
+                  parsed.append((char) ch);
+                  break;
+                case 'b':
+                  parsed.append('\b');
+                  break;
+                case 'f':
+                  parsed.append('\f');
+                  break;
+                case 'n':
+                  parsed.append('\n');
+                  break;
+                case 'r':
+                  parsed.append('\r');
+                  break;
+                case 't':
+                  parsed.append('\t');
+                  break;
+                case 'u':
+                  throw new Exception("Unicode unsupported");
+                default:
+                  throw new Exception("Invalid backslash character: \\" + ch);
+              } // switch
+          } // if backslash
+        parsed.append(ch);
+      } // for
+
+    return parsed.toString();
   }// parseString
 
   /**
@@ -76,94 +144,97 @@ public class JSONUtils
    * @param str
    *          , a String of JSON
    * @return ArrayList, the array represented by the line of JSON
+   * @throws Exception
    * @pre TBA
    * @post TBA
    */
   public static ArrayList<Object> parseArray(String str)
+    throws Exception
   {
-    // Remove outside quotes
-    str = parseString(str);
-    // Initialize the output array
+    str = removeOutsideChars(str, '[', ']');
     ArrayList<Object> output = new ArrayList<Object>();
-    // Tracks current char as we iterate through the string
+    StringBuilder parsed = new StringBuilder();
     char current;
-    // Tracks the start of each element as we encounter them
-    int start = 0;
-    String parsed;
-    // Keeps track of the last Paren in the JSON string
-    int lastParen;
-    // Iterate through the string char by char
+    int countBrackets = 0;
     for (int i = 0; i < str.length(); i++)
       {
         current = str.charAt(i);
-        // If current is a number
         if ((current == '-') || (Character.isDigit(current)))
           {
-            lastParen = str.lastIndexOf(']');
-            start = i;
-            while ((i < str.length()) && (str.charAt(i) != ',')
-                   && (i != lastParen))
+            while ((i < str.length())
+                   && (!(str.charAt(i) == ',') && (!(str.charAt(i) == ']'))))
               {
+                parsed.append(str.charAt(i));
                 i++;
-              }// Find the end of the number
-            // Add the number to the output
-            parsed = str.substring(start, i);
-            output.add(parseInteger(parsed));
-          } // If digit
-        // If current is a String
+              }
+            output.add(parseInteger(parsed.toString()));
+            parsed.setLength(0);
+          }
         else if (current == '\"')
           {
-            start = i;
-            current = str.charAt(i);
-            while ((i < str.length()) && (str.charAt(i) != ','))
+            parsed.append(str.charAt(i));
+            i++;
+            while ((i < str.length()) && (!(str.charAt(i) == ',')))
               {
+                parsed.append(str.charAt(i));
                 i++;
-              } // find the end of the String
-            // Add the String to the output
-            parsed = str.substring(start, i);
-            output.add(parseString(parsed));
-          } // If String
-        // If current is an array
+              }
+            output.add(parseString(parsed.toString()));
+            parsed.setLength(0);
+          }
         else if (current == '[')
           {
-            lastParen = str.lastIndexOf(']');
-            start = i;
-            while ((i < str.length()) && (i != lastParen))
-              {
-                i++;
-              } // Find the end of the array
+            parsed.append(str.charAt(i));
+            countBrackets++;
             i++;
-            parsed = str.substring(start, i);
-            // Add the array to output
-            output.add(parseArray(parsed));
-          } // if Array
-        // if Current is an Object
+            while ((i < str.length()) && (countBrackets != 0))
+              {
+                if (str.charAt(i) == '[')
+                  {
+                    countBrackets++;
+                  }
+                else if (str.charAt(i) == ']')
+                  {
+                    countBrackets--;
+                  }
+                parsed.append(str.charAt(i));
+                i++;
+              }
+            output.add(parseArray(parsed.toString()));
+            parsed.setLength(0);
+          }
         else if (current == '{')
           {
-            lastParen = str.lastIndexOf('}');
-            start = i;
-            while ((i < str.length()) && (i != lastParen))
-              {
-                i++;
-              }// Find the end of the object
+            parsed.append(str.charAt(i));
+            countBrackets++;
             i++;
-            parsed = str.substring(start, i);
-            // add the object to the Output
-            output.add(parseObject(parsed));
-          } // if Object
-        // if Current is a symbolic Constant
+            while ((i < str.length()) && (countBrackets != 0))
+              {
+                if (str.charAt(i) == '{')
+                  {
+                    countBrackets++;
+                  }
+                else if (str.charAt(i) == '}')
+                  {
+                    countBrackets--;
+                  }
+                parsed.append(str.charAt(i));
+                i++;
+              }
+            output.add(parseObject(parsed.toString()));
+            parsed.setLength(0);
+          }
         else if (Character.isAlphabetic(str.charAt(i)))
           {
-            start = i;
-            while ((i < str.length()) && (str.charAt(i) != '}'))
+            while ((i < str.length()) && (!(str.charAt(i) == ']')))
               {
+                parsed.append(str.charAt(i));
                 i++;
-              }// Find the end of the constant
-            // and add it to the output
-            parsed = str.substring(start, i);
-            output.add(parseConstant(parsed));
-          }// If Constant
-      } // End Parsing input string
+              }
+            output.add(parseConstant(parsed.toString()));
+            parsed.setLength(0);
+          }
+      }
     return output;
   } // end parseArray
 
@@ -173,127 +244,122 @@ public class JSONUtils
    * @param str
    *          , a line of JSON code
    * @return Hashtable, the fields and values of an object stored in a hashtable
+   * @throws Exception
    * @pre TBA
    * @post TBA
    */
   public static Hashtable<String, Object> parseObject(String str)
+    throws Exception
   {
-    // Declare variables to keep track of output, current position,
-    // current key,start of current object,
+    str = removeOutsideChars(str, '{', '}');
     Hashtable<String, Object> output = new Hashtable<String, Object>();
-    str = parseString(str);
-    char current;
-    int start = 0;
-    int lastParen;
     String key = null;
-    String parsed;
-    // Iterate through the input string char by char
+    StringBuilder parsed = new StringBuilder();
+    char current;
+    int countBrackets = 0;
+
     for (int i = 0; i < str.length(); i++)
       {
         current = str.charAt(i);
-        // if current is a Key (string)
         if (current == '\"')
           {
             i++;
-            start = i;
-            current = str.charAt(i);
-            while ((i < str.length()) && (str.charAt(i) != '\"'))
+            while ((i < str.length()) && (!(str.charAt(i) == '\"')))
               {
+                parsed.append(str.charAt(i));
                 i++;
-              }// find the end of the Key and store it
-            key = str.substring(start, i);
-          } // if Key
-        // if the next char after key is a :, figure out what value is after
-        // that
+              }
+            key = parsed.toString();
+            parsed.setLength(0);
+          }
         else if (current == ':')
           {
             i++;
-            start = i;
-            // if the next value is a number
             if ((str.charAt(i) == '-') || (Character.isDigit(str.charAt(i))))
               {
-                lastParen = str.lastIndexOf(']');
-                while ((i < str.length()) && (str.charAt(i) != ',')
-                       && (i != lastParen))
+                while ((i < str.length())
+                       && (!(str.charAt(i) == ',') && (!(str.charAt(i) == ']'))))
                   {
+                    parsed.append(str.charAt(i));
                     i++;
-                  }// find the end of the number
-                parsed = str.substring(start, i);
-                if (key != null)
-                  {
-                    output.put(key, parseInteger(parsed));
-                    key = null;
-                  }// Add the number and its key to the output
-              } // if Number
-            // if the next value is a String
+                  }
+                output.put(key, parseInteger(parsed.toString()));
+                key = null;
+                parsed.setLength(0);
+              }
             else if (str.charAt(i) == '\"')
               {
-                while ((i < str.length()) && (str.charAt(i) != ','))
+                parsed.append(str.charAt(i));
+                i++;
+                while ((i < str.length()) && (!(str.charAt(i) == ',')))
                   {
+                    parsed.append(str.charAt(i));
                     i++;
-                  }// find the end of the String
-                parsed = str.substring(start, i);
-                if (key != null)
-                  {
-                    output.put(key, parseString(parsed));
-                    key = null;
-                  }// Add the String and its key to the output
-              } // if String
-            // if the next Value is an Array
+                  }
+                output.put(key, parseString(parsed.toString()));
+                key = null;
+                parsed.setLength(0);
+              }
             else if (str.charAt(i) == '[')
               {
-                lastParen = str.lastIndexOf(']');
-                // while ((i < str.length()) && (str.charAt(i) != ']'))
-                while ((i < str.length()) && (i != lastParen))
-                  {
-                    i++;
-                  }// find the end of the Array
+                parsed.append(str.charAt(i));
+                countBrackets++;
+
                 i++;
-                parsed = str.substring(start, i);
-                if (key != null)
+                while ((i < str.length()) && (countBrackets != 0))
                   {
-                    output.put(key, parseArray(parsed));
-                    key = null;
-                  }// Add the array and its key to the output
-              } // if Array
-            // if the next value is another object
+                    if (str.charAt(i) == '[')
+                      {
+                        countBrackets++;
+                      }
+                    else if (str.charAt(i) == ']')
+                      {
+                        countBrackets--;
+                      }
+                    parsed.append(str.charAt(i));
+                    i++;
+                  }
+                output.put(key, parseArray(parsed.toString()));
+                key = null;
+                parsed.setLength(0);
+              }
             else if (str.charAt(i) == '{')
               {
-                lastParen = str.lastIndexOf('}');
-                while ((i < str.length()) && (i != lastParen))
-                  {
-                    i++;
-                  }// find the end of the object
+                parsed.append(str.charAt(i));
+                countBrackets++;
                 i++;
-                parsed = str.substring(start, i);
-                if (key != null)
+                while ((i < str.length()) && (countBrackets != 0))
                   {
-                    output.put(key, parseObject(parsed));
-                    key = null;
-                  } // and add the object and it's key to the output
-              } // if Object
-            // Else if the next value is a symbolic constant
+                    if (str.charAt(i) == '{')
+                      {
+                        countBrackets++;
+                      }
+                    else if (str.charAt(i) == '}')
+                      {
+                        countBrackets--;
+                      }
+                    parsed.append(str.charAt(i));
+                    i++;
+                  }
+                output.put(key, parseObject(parsed.toString()));
+                key = null;
+                parsed.setLength(0);
+              }
             else if (Character.isAlphabetic(str.charAt(i)))
               {
-                while ((i < str.length()) && (str.charAt(i) != '}'))
+                while ((i < str.length()) && (!(str.charAt(i) == ']')))
                   {
+                    parsed.append(str.charAt(i));
                     i++;
-                  }// find the end of the constant
-                parsed = str.substring(start, i);
-                if (key != null)
-                  {
-                    output.put(key, parseConstant(parsed));
-                    key = null;
-                    /*
-                     * MUST FIX: Hashtables throw exception when we try to put
-                     * null
-                     */
-                  }// and add the constant and it's key to the output
-              } // if Constant
-          }// If the character after the key is :
-      } // end parsing input string
+                  }
+                output.put(key, parseConstant(parsed.toString()));
+                key = null;
+                parsed.setLength(0);
+              }
+          }
+      }
     return output;
-  } // end parseObject
+  }
 
   /**
    * parseConstant
@@ -324,10 +390,12 @@ public class JSONUtils
    * @param str
    *          , a String of JSON code
    * @return the java Object represented by the inputted string
+   * @throws Exception
    * @pre TBA
    * @post TBA
    */
   public static Object parse(String str)
+    throws Exception
   {
     char first = str.charAt(0);
 
@@ -362,18 +430,19 @@ public class JSONUtils
    *          code
    * @return object, a Java object represented by the JSON input
    **/
-  public static void parse(BufferedReader read, String filename)
+  public static void parseFile(String filename)
     throws Exception
   {
     String line;
-    java.io.File infile = new java.io.File(filename);
-    java.io.FileReader istream = new java.io.FileReader(infile);
-    read = new BufferedReader(istream);
+    StringBuilder input = new StringBuilder();
+    BufferedReader read = new BufferedReader(new FileReader(filename));
     // get a line from the file
     while ((line = read.readLine()) != null)
       {
-        parse(line);
+        input.append(line);
       } // parse until there are no more lines
+    // parse(input.toString());
+    System.out.println(parse(input.toString()));
     read.close();
   } // parse(BufferedReader, String)
 

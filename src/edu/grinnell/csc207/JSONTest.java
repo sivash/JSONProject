@@ -12,6 +12,7 @@ public class JSONTest
 {
   @Test
   public void parseConstanttest()
+    throws Exception
   {
     assertTrue((JSONUtils.parse("null") == null));
     assertTrue(((Boolean) JSONUtils.parse("true") == true));
@@ -20,6 +21,7 @@ public class JSONTest
 
   @Test
   public void parseIntegertest()
+    throws Exception
   {
     /*
      * These tests will cover all the different representations of number values
@@ -53,6 +55,7 @@ public class JSONTest
 
   @Test
   public void parseStringtest()
+    throws Exception
   {
     /*
      * Parsing a JSONString should return the same string, without the quotation
@@ -68,6 +71,7 @@ public class JSONTest
 
   @Test
   public void parseArraytest()
+    throws Exception
   {
     /*
      * An array should be able to accept all four types of values from the JSON
@@ -106,6 +110,7 @@ public class JSONTest
 
   @Test
   public void parseObjecttest()
+    throws Exception
   {
     /*
      * Testing a String that represents a Hashtable with BigDecimals, Strings
@@ -115,7 +120,7 @@ public class JSONTest
         "{\"Department\":\"CSC\",\"Number\":207,\"Prof\":"
             + "{\"LName\":\"Rebelsky\",\"FName\":\"Sam\"}}";
 
-    Hashtable hash2 = new Hashtable<Object, String>();
+    Hashtable<Object, String> hash2 = new Hashtable<Object, String>();
 
     hash2.put("LName", "Rebelsky");
     hash2.put("FName", "Sam");
@@ -130,6 +135,7 @@ public class JSONTest
 
   @Test
   public void ToBigDecimal()
+    throws Exception
   {
     BigDecimal input = (BigDecimal) JSONUtils.parse("2e2");
     BigDecimal input2 = (BigDecimal) JSONUtils.parse("300");
@@ -147,6 +153,7 @@ public class JSONTest
 
   @Test
   public void ToString()
+    throws Exception
   {
     String input = (String) JSONUtils.parse("\"HELLO\"");
     String input2 = (String) JSONUtils.parse("\"STRING\"");
@@ -160,6 +167,7 @@ public class JSONTest
 
   @Test
   public void ToArray()
+    throws Exception
   {
     String str = "[1,[12,23,545,30000],545]";
     ArrayList<Object> arr = (ArrayList<Object>) JSONUtils.parse(str);
@@ -177,6 +185,7 @@ public class JSONTest
 
   @Test
   public void ToObj()
+    throws Exception
   {
     String str = "{\"Words\":[\"Hello\"]}";
     Hashtable<String, Object> hash =
