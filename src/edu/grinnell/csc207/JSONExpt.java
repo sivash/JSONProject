@@ -7,6 +7,18 @@ import java.util.Hashtable;
 //import java.util.Hashtable;
 public class JSONExpt
 {
+  public static void printArray(Object[] objs)
+  {
+    java.io.PrintWriter pen = new java.io.PrintWriter(System.out, true);
+    pen.print("[");
+    for (int i = 0; i < objs.length - 1; i++)
+      {
+        pen.print(objs[i] + ", ");
+      }
+    pen.print(objs[objs.length - 1]);
+    pen.println("]");
+  }
+
   public static void main(String[] args)
     throws Exception
   {

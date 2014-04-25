@@ -566,7 +566,18 @@ public class JSONUtils
         throw new Exception("Input " + str + " is not a proper JSON String");
       } // If inputted String is not any of the above
     return result;
-  } // parse(String)​
+  } // parse(String)
+
+  public static Object[] parse(String[] strs)
+    throws Exception
+  {
+    Object[] output = new Object[strs.length];
+    for (int i = 0; i < strs.length; i++)
+      {
+        output[i] = parse(strs[i]);
+      }// Parses each string into an object and add it to output array
+    return output;
+  }
 
   /**
    * parse Parses JSON from a file
@@ -576,7 +587,8 @@ public class JSONUtils
    *          code
    * @return object, a Java object represented by the JSON input
    **/
-  public static void parseFile(String filename)
+
+  public static Object parseFile(String filename)
     throws Exception
   {
     String line;
@@ -591,8 +603,8 @@ public class JSONUtils
             input.append(line);
           } // parse until there are no more lines
         // parse(input.toString());
-        System.out.println(parse(input.toString()));
         read.close();
+        return parse(input.toString());
       } // try
     catch (Exception e)
       {
@@ -600,6 +612,26 @@ public class JSONUtils
       } // catch
 
   } // parse(BufferedReader, String)
+
+  /**
+   * parse Parses JSON from a file
+   * 
+   * @param filename
+   *          filenames, and array of strings with the location of files with
+   *          JSON code
+   * @return object[], an array of Java objects represented by the JSON inputs
+   **/
+
+  public static Object[] parseFile(String[] filenames)
+    throws Exception
+  {
+    Object[] parsedArray = new Object[filenames.length];
+    for (int i = 0; i < filenames.length; i++)
+      {
+        parsedArray[i] = parseFile(filenames[i]);
+      } // parses JSON from each file and adds it to output array
+    return parsedArray;
+  }
 
   /*
    * --------Java Object -> JSON String Methods--------
