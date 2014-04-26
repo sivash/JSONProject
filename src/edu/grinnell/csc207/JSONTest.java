@@ -8,6 +8,10 @@ import java.util.Hashtable;
 
 import org.junit.Test;
 
+/**
+ * @author Ashwin Sivaramakrishnan
+ * @author Phineas Schlossberg
+ */
 public class JSONTest
 {
   @Test
@@ -134,7 +138,7 @@ public class JSONTest
   }// parseObjecttest()
 
   @Test
-  public void ToBigDecimal()
+  public void bigDecimaltoJSONString()
     throws Exception
   {
     BigDecimal input = (BigDecimal) JSONUtils.parse("2e2");
@@ -149,10 +153,10 @@ public class JSONTest
     assertEquals(JSONUtils.toJSONString(input2), str2);
     assertEquals(JSONUtils.toJSONString(input3), str3);
 
-  }// ToBigDecimal()
+  }// bigDecimaltoJSONString()
 
   @Test
-  public void ToString()
+  public void stringToJSONString()
     throws Exception
   {
     String input = (String) JSONUtils.parse("\"HELLO\"");
@@ -163,28 +167,28 @@ public class JSONTest
 
     assertEquals(JSONUtils.toJSONString(input), str);
     assertEquals(JSONUtils.toJSONString(input2), str2);
-  }// ToString()
+  }// stringToJSONString()
 
   @Test
-  public void ToArray()
+  public void arrayListToJSONString()
     throws Exception
   {
     String str = "[1,[12,23,545,30000],545]";
     ArrayList<Object> arr = (ArrayList<Object>) JSONUtils.parse(str);
     String result = JSONUtils.toJSONString(arr);
 
-    assertEquals(result, str);
+    assertEquals(str, result);
 
     str = "[[212,\"a\",{\"ids\":[32,20]}],true]";
     arr = (ArrayList<Object>) JSONUtils.parse(str);
     result = JSONUtils.toJSONString(arr);
 
-    assertEquals(result, str);
+    assertEquals(str, result);
 
-  }// ToArray()
+  }// arrayListToJSONString()
 
   @Test
-  public void ToObj()
+  public void hashToJSONString()
     throws Exception
   {
     String str = "{\"Words\":[\"Hello\"]}";
@@ -192,7 +196,7 @@ public class JSONTest
         (Hashtable<String, Object>) JSONUtils.parse(str);
     String result = JSONUtils.toJSONString(hash);
 
-    assertEquals(result, str);
+    assertEquals(str, result);
 
     str = "{\"Age\":25}";
 
@@ -200,6 +204,6 @@ public class JSONTest
     result = JSONUtils.toJSONString(hash);
     assertEquals(result, str);
 
-  }// ToObj()
+  }// hashToJSONString()
 
 }// class JSONTest()

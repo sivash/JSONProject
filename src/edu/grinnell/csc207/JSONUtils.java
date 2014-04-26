@@ -11,20 +11,27 @@ import java.io.FileReader;
 import java.lang.StringBuilder;
 
 /**
- * @authors Ashwin Sivaramakrishnan
- *          Phineas Schlossberg
+ * @author Ashwin Sivaramakrishnan
+ * @author Phineas Schlossberg
  */
 /**
  * @Sources For enumeration inspiration
+ * 
  *          http://stackoverflow.com/questions/2048131
  *          /get-an-enumeration-for-the -keys-of-a-map-hashmap-in-java
+ * 
+ *          parseString code modified from
+ *          https://github.com/Grinnell-CSC207/sample-json-parser
+ * 
+ *          Objects' class
+ *          http://stackoverflow.com/questions/541749/how-to-determine
+ *          -an-objects-class-in-java
  */
 public class JSONUtils
 {
-
   /**
-   * removeOutsideChars removes the characters surrounding a string, if they
-   * match the inputted first and last chars.
+   * removeOutsideChars removeOutsideChars removes the characters surrounding a
+   * string, if they match the inputted first and last chars.
    * 
    * @param str
    *          , a string
@@ -33,10 +40,14 @@ public class JSONUtils
    * @param last
    *          , a char
    * @return str without outside characters
-   * @pre TBA
-   * @post TBA
+   * @pre str.length > 2,
+   * @post output.length = str.length - 2, output is str minus the first
+   *       character (if it matches first) and last character (if it matches
+   *       last)
    * @throws Exception
+   *           "Unexpected outside chars around str"
    */
+
   public static String removeOutsideChars(String str, char first, char last)
     throws Exception
   {
@@ -47,21 +58,24 @@ public class JSONUtils
     else
       // otherwise throw an exception
       throw new Exception("Unexpected outside chars around " + str);
-  } // removeOutsideChars
+  } // removeOutsideChars(String, char, char)
 
   /**
-   * removeWhiteSpace removes the whitespace starting from a given index until
-   * the end of consecutive whitespace characters in the string
+   * removeWhiteSpace removeWhiteSpace removes the whitespace starting from a
+   * given index until the end of consecutive whitespace characters in the
+   * string
    * 
    * @param str
    *          , a string
    * @param index
    *          , an int
    * @return str without consecutive whitespace starting from index
-   * @pre TBA
-   * @post TBA
+   * @pre 0 < index < str.length - 1
+   * @post output is str without spaces after the index'th char
    * @throws Exception
+   *           "Cannot parse empty strings"
    */
+
   public static Object[] removeWhiteSpace(String str, int index)
     throws Exception
   {
@@ -72,7 +86,7 @@ public class JSONUtils
         output[0] = str;
         output[1] = index;
         return output;
-      }
+      }// if current char is space
     else
       {
         while ((lastSpace < str.length()) && (str.charAt(lastSpace) == ' '))
@@ -86,9 +100,9 @@ public class JSONUtils
             output[0] = str.substring(lastSpace, str.length());
             output[1] = lastSpace;
             return output;
-          }
+          }// else
       }// else
-  }// removeWhiteSpace(String, index)
+  }// removeWhiteSpace(String, int)
 
   /*
    * --------JSON String -> Java Object Methods--------
@@ -101,9 +115,10 @@ public class JSONUtils
    *          , a string of JSON
    * @return BigDecimal, the number represented by Str
    * @throws Exception
-   * @Pre TBA
-   * @Post TBA
+   * @Pre str is a properly formatted JSON number
+   * @Post Output is the number represented by str in BigDecimal form
    */
+
   public static BigDecimal parseInteger(String str)
     throws Exception
   {
@@ -133,7 +148,7 @@ public class JSONUtils
             output = output.multiply(BigDecimal.TEN.pow(power));
           } // If there is an e
         return output;
-      }
+      }// try
     catch (Exception e)
       {
         throw new Exception("Input " + str + " is not a proper number");
@@ -147,9 +162,10 @@ public class JSONUtils
    * @param str
    *          , a String of JSON
    * @return String, the string represented by the line of JSON
-   * @pre TBA
-   * @post TBA
+   * @pre String is a properly formatted JSON string
+   * @post Output is the string represented by the JSON string
    */
+
   public static String parseString(String str)
     throws Exception
   {
@@ -208,9 +224,10 @@ public class JSONUtils
    *          , a String of JSON
    * @return ArrayList, the array represented by the line of JSON
    * @throws Exception
-   * @pre TBA
-   * @post TBA
+   * @pre str is a properly JSON array
+   * @post Output is the array represented by the string of JSON
    */
+
   public static ArrayList<Object> parseArray(String str)
     throws Exception
   {
@@ -280,7 +297,7 @@ public class JSONUtils
                   } // if closing bracket
                 parsed.append(str.charAt(i));
                 i++;
-              }
+              }// while
             // loop ends when countBrackets is reduced to 0, or the input ends
             // send parsed value to parseArray and add to output
             output.add(parseArray(parsed.toString()));
@@ -334,9 +351,11 @@ public class JSONUtils
    *          , a line of JSON code
    * @return Hashtable, the fields and values of an object stored in a hashtable
    * @throws Exception
-   * @pre TBA
-   * @post TBA
+   * @pre str is a properly formatted JSON object
+   * @post output is a hashtable representing the object described by the JSON
+   *       string
    */
+
   public static Hashtable<String, Object> parseObject(String str)
     throws Exception
   {
@@ -405,7 +424,7 @@ public class JSONUtils
                     output.put(key, parseString(parsed.toString()));
                     key = null;
                     parsed.setLength(0);
-                  } // if string
+                  } // else if string
                 // if array
                 else if (str.charAt(i) == '[')
                   {
@@ -424,7 +443,7 @@ public class JSONUtils
                         else if (str.charAt(i) == ']')
                           {
                             countBrackets--;
-                          } // if closing bracket decrement count
+                          } // else if closing bracket decrement count
                         // otherwise add the char to parsed
                         parsed.append(str.charAt(i));
                         i++;
@@ -433,7 +452,7 @@ public class JSONUtils
                     output.put(key, parseArray(parsed.toString()));
                     key = null;
                     parsed.setLength(0);
-                  } // if array
+                  } // else if array
                 // if object
                 else if (str.charAt(i) == '{')
                   {
@@ -452,7 +471,7 @@ public class JSONUtils
                         else if (str.charAt(i) == '}')
                           {
                             countBrackets--;
-                          } // if closing bracket decrement count
+                          } // else if closing bracket decrement count
                         // otherwise add the char to parsed
                         parsed.append(str.charAt(i));
                         i++;
@@ -461,7 +480,7 @@ public class JSONUtils
                     output.put(key, parseObject(parsed.toString()));
                     key = null;
                     parsed.setLength(0);
-                  } // if array
+                  } // else if array
                 // if Symbolic Constant
                 else if (Character.isAlphabetic(str.charAt(i)))
                   {
@@ -482,7 +501,7 @@ public class JSONUtils
     catch (Exception e)
       {
         throw new Exception("Input " + str + " is not a proper object.");
-      }
+      }// catch
     return output;
   } // parseArray (String str)
 
@@ -493,9 +512,10 @@ public class JSONUtils
    *          , a String of JSON code
    * @return Boolean, either true, false, or null
    * @throws Exception
-   * @pre TBA
-   * @post TBA
+   * @pre str is a properly formatted JSON Symbolic Constant
+   * @post output is the constant represented by the JSON string
    */
+
   public static Boolean parseConstant(String str)
     throws Exception
   {
@@ -516,6 +536,8 @@ public class JSONUtils
   } // end parseConstant​
 
   /**
+   * parse
+   * 
    * Parse a JSON string and return an object that corresponds to the value
    * described in that string. See README.md for further details.
    * 
@@ -523,9 +545,11 @@ public class JSONUtils
    *          , a String of JSON code
    * @return the java Object represented by the inputted string
    * @throws Exception
-   * @pre TBA
-   * @post TBA
+   * @pre Str is a properly formatted string of JSON representing a number,
+   *      string, array, object, or symbolic constant
+   * @post Output is the object represented by the JSON string
    */
+
   public static Object parse(String str)
     throws Exception
   {
@@ -544,29 +568,42 @@ public class JSONUtils
     else if (first == '\"')
       {
         result = parseString(str);
-      } // if JSON string is a String
+      } // else if JSON string is a String
     else if (first == '[')
       {
         result = parseArray(str);
-      } // if JSON string is an Array
+      } // else if JSON string is an Array
     else if (first == '{')
       {
         result = parseObject(str);
-      } // if JSON string is an Object
+      } // else if JSON string is an Object
     else if (Character.isAlphabetic(first))
       {
         result = parseConstant(str);
         if (result == null)
           {
             hasNull = true;
-          }
-      } // if JSON string is a Symbolic Constant
+          }// if
+      } // else if JSON string is a Symbolic Constant
     if (result == null && hasNull == false)
       {
         throw new Exception("Input " + str + " is not a proper JSON String");
-      } // If inputted String is not any of the above
+      } // If inputed String is not any of the above
     return result;
   } // parse(String)
+
+  /**
+   * Parse an array of JSON strings and return an array of objects that
+   * correspond to the values described in the strings.
+   * 
+   * @param String
+   *          [] strs , an array of Strings of JSON code
+   * @return the Object[] represented by the inputed strings
+   * @throws Exception
+   * @pre String[] strs, an array of Strings that represent JSONStrings
+   * @post Returns an array of Objects that correspond to the inputed
+   *       JSONStrings.
+   */
 
   public static Object[] parse(String[] strs)
     throws Exception
@@ -575,9 +612,9 @@ public class JSONUtils
     for (int i = 0; i < strs.length; i++)
       {
         output[i] = parse(strs[i]);
-      }// Parses each string into an object and add it to output array
+      }// Parses each string into an object and adds it to output array
     return output;
-  }
+  }// parse(Object[])
 
   /**
    * parse Parses JSON from a file
@@ -586,6 +623,8 @@ public class JSONUtils
    *          , a BufferedReader, filename, the location of a file with JSON
    *          code
    * @return object, a Java object represented by the JSON input
+   * @pre String filename, which must be a valid existing file
+   * @post Returns an object corresponding to the JSONString in the file
    **/
 
   public static Object parseFile(String filename)
@@ -596,13 +635,11 @@ public class JSONUtils
     try
       {
         BufferedReader read = new BufferedReader(new FileReader(filename));
-
         // get a line from the file
         while ((line = read.readLine()) != null)
           {
             input.append(line);
           } // parse until there are no more lines
-        // parse(input.toString());
         read.close();
         return parse(input.toString());
       } // try
@@ -610,7 +647,6 @@ public class JSONUtils
       {
         throw new Exception("Inputted file\"" + filename + "\" not found.");
       } // catch
-
   } // parse(BufferedReader, String)
 
   /**
@@ -620,65 +656,81 @@ public class JSONUtils
    *          filenames, and array of strings with the location of files with
    *          JSON code
    * @return object[], an array of Java objects represented by the JSON inputs
+   * 
+   * @pre String[] of filenames
+   * @post Returns an Array of Objects[] based on the contents of the files.
    **/
 
   public static Object[] parseFile(String[] filenames)
     throws Exception
   {
-    Object[] parsedArray = new Object[filenames.length];
-    for (int i = 0; i < filenames.length; i++)
+    try
       {
-        parsedArray[i] = parseFile(filenames[i]);
-      } // parses JSON from each file and adds it to output array
-    return parsedArray;
-  }
+        Object[] parsedArray = new Object[filenames.length];
+        for (int i = 0; i < filenames.length; i++)
+          {
+            parsedArray[i] = parseFile(filenames[i]);
+          } // for
+        // parses JSON from each file and adds it to output array
+        return parsedArray;
+      }// try
+    catch (Exception e)
+      {
+        throw new Exception("Inputted files not found.");
+      }// catch
+  }// parseFile(String[])
 
   /*
    * --------Java Object -> JSON String Methods--------
    */
 
   /**
-   * toBigDecimal
+   * bigDecimaltoJSONString
    * 
    * @param obj
    *          , a number
    * @return str, a line of JSON code representing obj
-   * @pre TBA
-   * @post TBA
+   * @pre Object obj, a BigDecimal
+   * @post Returns the corresponding JSONString for obj.
    */
-  public static String toBigDecimal(Object obj)
+  public static String bigDecimaltoJSONString(Object obj)
   {
     BigDecimal number = (BigDecimal) obj;
     return number.toString();
-  } // toBigDecimal(Object obj)
+  } // bigDecimaltoJSONString(Object obj)
 
   /**
-   * toStr
+   * stringToJSONString
    * 
    * @param obj
    *          , a String
    * @return str, a line of JSON code representing obj
-   * @pre TBA
-   * @post TBA
+   * @pre Object obj, a String
+   * @post Returns the corresponding JSONString for obj.
    */
-  public static String toStr(Object obj)
+  public static String stringToJSONString(Object obj)
   {
-    String input = (String) obj;
-    return "\"" + input + "\"";
-  } // toStr(Object obj)
+    StringBuilder input = new StringBuilder();
+    input.append('\"');
+    input.append(((String) obj));
+    input.append('\"');
+
+    return input.toString();
+  } // stringToJSONString(Object obj)
 
   /**
-   * toArrayList
+   * arrayListToJSONString
    * 
    * @param obj
    *          , an ArrayList
    * @return str, a line of JSON code representing obj
-   * @pre TBA
-   * @post TBA
+   * @pre Object obj, an ArrayList
+   * @post Returns the corresponding JSONString for obj.
    */
-  public static String toArrayList(Object obj)
+  public static String arrayListToJSONString(Object obj)
   {
-    String input = "[";
+    StringBuilder input = new StringBuilder();
+    input.append("[");
     ArrayList<?> arr = (ArrayList<?>) obj;
     Object[] values = arr.toArray();
     // Iterate through the array til no more elements
@@ -688,50 +740,56 @@ public class JSONUtils
         // String
         if (values[i] instanceof BigDecimal)
           {
-            values[i] = toBigDecimal(values[i]);
-          }
+            values[i] = bigDecimaltoJSONString(values[i]);
+          }// if
         // if next value is a String, call procedure to convert to JSON String
         else if (values[i] instanceof String)
           {
-            values[i] = toStr(values[i]);
-          }
+            values[i] = stringToJSONString(values[i]);
+          }// else if
         // if next value is an Array, recursively call procedure to convert to
         // JSON String
         else if (values[i] instanceof ArrayList<?>)
           {
-            values[i] = toArrayList(values[i]);
-          }
+            values[i] = arrayListToJSONString(values[i]);
+          }// else if
         // if next value is an Object, call procedure to convert to JSON String
         else if (values[i] instanceof Hashtable<?, ?>)
           {
-            values[i] = toHash(values[i]);
-          }
+            values[i] = hashToJSONString(values[i]);
+          }// else if
         // Add last element
         if (i == values.length - 1)
           {
-            input = input + values[i];
-          }
+            input.append(values[i]);
+          }// if
         else
-          input = input + values[i] + ",";
-      } // end parsing Array
-    input = input + "]";
-    return input;
-  } // end toArrayList
+          {
+            input.append(values[i]);
+            input.append(",");
+          }// else
+      }// for
+    // end parsing Array
+    input.append("]");
+    return input.toString();
+  } // arrayListToJSONString(Object)
 
   /**
-   * toHash
+   * hashToJSONString
    * 
    * @param obj
    *          , a hashtable representing an object
    * @return Str, a string representing that object
-   * @pre TBA
-   * @post TBA
+   * @pre Object obj, a HashTable
+   * @post Returns the corresponding JSONString for obj.
    */
-  public static String toHash(Object obj)
+  public static String hashToJSONString(Object obj)
   {
     // Initialize current key, value, hash table, and enumeration to
     // check if we have more in the table.
-    String input = "{";
+    StringBuilder input = new StringBuilder();
+    input.append("{");
+
     Object value;
     Object key;
     @SuppressWarnings("unchecked")
@@ -742,52 +800,59 @@ public class JSONUtils
     while (keys.hasMoreElements())
       {
         // Set key to next key
-        key = toStr(keys.nextElement());
+        key = stringToJSONString(keys.nextElement());
         // add to output
-        input = input + key + ":";
+        input.append(key);
+        input.append(":");
         // Set value to next value
         value = values.nextElement();
         // if value is a number
         if (value instanceof BigDecimal)
           {
-            value = toBigDecimal(value);
-            input = input + value + ",";
-          }// add it to the output
-        // if value is a String
+            value = bigDecimaltoJSONString(value);
+            input.append(value);
+            input.append(",");
+          }// if value is a String
+        // add it to the output
         else if (value instanceof String)
           {
-            value = toStr(value);
-            input = input + value + ",";
-          }// add it to the output
-        // if value is an array
+            value = stringToJSONString(value);
+            input.append(value);
+            input.append(",");
+          }// if value is an array
+        // add it to the output
         else if (value instanceof ArrayList<?>)
           {
-            value = toArrayList(value);
-            input = input + value + ",";
-          }// add it to the output
-        // if value is another array
+            value = arrayListToJSONString(value);
+            input.append(value);
+            input.append(",");
+
+          }// if value is another array
+        // add it to the output
         else if (value instanceof Hashtable<?, ?>)
           {
-            value = toHash(value);
-            input = input + value + ",";
-          }// add it to the output
+            value = hashToJSONString(value);
+            input.append(value);
+            input.append(",");
+          }// if
+        // add it to the output
       } // end Parsing hashTable
     // remove extraneous comma at end of output and add end brace
-    input = input.substring(0, input.length() - 1);
-    input = input + "}";
-    return input;
-  } // toHash (Object obj)
+    input.setLength(input.length() - 1);
+    input.append("}");
+    return input.toString();
+  } // hashToJSONString(Object obj)
 
   /**
-   * toConstant
+   * constantToJSONString
    * 
    * @param obj
    *          , a Symbolic Constant null, false, or true
    * @return str, a JSON line representing that constant
-   * @pre TBA
-   * @post TBA
+   * @pre Object obj, a Boolean
+   * @post Returns the corresponding JSONString for obj.
    */
-  public static String toConstant(Object obj)
+  public static String constantToJSONString(Object obj)
   {
     // figure out what constant it is
     String result;
@@ -799,46 +864,56 @@ public class JSONUtils
       result = "false";
     // and return it
     return result;
-  } // toConstant(Object obj)
+  } // constantToJSONString(Object obj)
 
   /**
+   * toJSONString
+   * 
    * Given an object created by parse, generate the JSON string that corresponds
    * to the object.
    * 
    * @exception Exception
    *              If the object cannot be converted, e.g., if it does not
    *              correspond to something created by parse.
+   * @pre An object that is either a BigInteger, a String, an ArrayList, a
+   *      Hashtable or a Boolean
+   * @post Returns the corresponding JSONString for the object
    */
   public static String toJSONString(Object obj)
+    throws Exception
   {
     String output = null;
     // Determine what the object we're dealing with is
     // if number, call the toBigDecimal
     if (obj instanceof BigDecimal)
       {
-        return toBigDecimal(obj);
+        output = bigDecimaltoJSONString(obj);
       } // if Number
     // if a string, call toStr
     else if (obj instanceof String)
       {
-        return toStr(obj);
+        output = stringToJSONString(obj);
       } // if String
     // if an Array, call toArrayList
     else if (obj instanceof ArrayList<?>)
       {
-        return toArrayList(obj);
+        output = arrayListToJSONString(obj);
       } // if Array
     // if a Hashtable, call toHash
     else if (obj instanceof Hashtable<?, ?>)
       {
-        return toHash(obj);
+        output = hashToJSONString(obj);
       } // if Hash (object)
     // if a symbolic constant, call toConstant
     else if (obj instanceof Boolean)
       {
-        return toConstant(obj);
+        output = constantToJSONString(obj);
       } // if constant
-
+    if (output == null)
+      {
+        throw new Exception("Object " + obj.getClass()
+                            + " is not supported by this method.");
+      }// if
     return output;
   } // toJSONString(Object)
 
@@ -849,8 +924,8 @@ public class JSONUtils
    * returned object. Useful for testing specific sets of strings without having
    * to print them manually
    * 
-   * @pre TBA
-   * @post TBA
+   * @pre none
+   * @post Prints the string built and operates until Quit command is issued
    */
   public static void iParser()
     throws Exception
@@ -866,6 +941,7 @@ public class JSONUtils
     Object[] values = new Object[5];
     int index = 0;
 
+    // Prints options, and performs actions based on the options selected.
     while (true)
       {
         pen.println("Enter the Object you would like to build: ");
@@ -916,7 +992,7 @@ public class JSONUtils
                       result = parseConstant(value);
                       values[index] = result;
                       break;
-                  }
+                  }// switch
                 index++;
                 if (index > 4)
                   index = 0;

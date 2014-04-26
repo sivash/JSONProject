@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.math.BigDecimal;
 import java.util.Hashtable;
 
-//import java.util.Hashtable;
+/**
+ * @author Ashwin Sivaramakrishnan
+ * @author Phineas Schlossberg
+ */
+
 public class JSONExpt
 {
   public static void printArray(Object[] objs)
@@ -14,10 +18,10 @@ public class JSONExpt
     for (int i = 0; i < objs.length - 1; i++)
       {
         pen.print(objs[i] + ", ");
-      }
+      } // for
     pen.print(objs[objs.length - 1]);
     pen.println("]");
-  }
+  }// printArray(Object[])
 
   public static void main(String[] args)
     throws Exception
@@ -35,14 +39,14 @@ public class JSONExpt
     System.out.println("----------------------------");
 
     System.out.println(JSONUtils.parse(" 4"));
-    System.out.println(JSONUtils.parse("      -11.23"));
+    System.out.println(JSONUtils.parse("      -1123"));
     System.out.println(JSONUtils.parse("    2e2"));
 
     System.out.println("____________________________");
     System.out.println("parseString");
     System.out.println("----------------------------");
 
-    System.out.println(JSONUtils.parse("    \"Hello\""));
+    System.out.println(JSONUtils.parse("   \"Hello\""));
 
     System.out.println("____________________________");
     System.out.println("parseArray");
@@ -120,7 +124,7 @@ public class JSONExpt
     System.out.println(JSONUtils.parse("[1,[12,23,545,30000],[20]]"));
     System.out.println(JSONUtils.parse("[{\"a\":[{},{}]},[]]"));
 
-    JSONUtils.parseFile("/home/sivarama/FileTest");
+    System.out.println(JSONUtils.parseFile("/home/sivarama/FileTest"));
 
     System.out.println(JSONUtils.parse("\"Hel\u2206lo\""));
     System.out.println("\u2202");
