@@ -1,0 +1,48 @@
+Authors: Phineas Schlossberg & Ashwin Sivaramakrishnan
+
+A short description of special features you decided to include and why you decided on those features.
+An explanation of what criteria you used in deciding upon your license.
+Comments on any other aspect of the project that you think I should know about.
+
+Our JSON Library provides the standard parsing and unparsing features. That
+is, the user can input a Java object (Of the types BigDecimal, String,
+Array, and general objects in the form of a hashtable. 
+In addition to these standard features, our Libray includes the following:
+   Unicode processing:
+Allows for more diversity in strings, unicode
+processing is already built into Java, it seems silly to not allow it
+through our parser.
+        Whitespace processing:
+If the JSON strings are entered by hand, including
+spaces after commas and the like is habitual. We don't want our program to
+crash just because someone seperated the elements in their arrays with
+spaces. This also allows greater readability of input, meaning the user is
+less likely to make further errors in formatting the input.
+     Error Checking:
+ Our methods will throw an appropriate exception when
+encountering formatting mistakes. The error messages will not point out the
+specific character that is the problem, but will generally say what type of
+value caused the problem. For example, if you tried to parse the JSON
+String : "[5,5aaa13,55]", the program would throw the exception "Input
+5aaa13 is not a proper number" which should be enough information for the
+user to fix their error.
+     Object Building Interface: 
+Builds and prints an object from a user inputted
+JSON String. This interface is useful for testing specific sets of strings
+without having to print them manually.
+        Parse from Array:
+Our JSON->Object parser can take an array of JSON Strings and return an
+array of objects. Especially useful for repeated or procedural use of our parser.
+        Parse from File:
+Our JSON->Object parser can read JSON from a file. parseFile takes a
+filename and returns the java object represented in that file.
+ Useful especially for non manual use of our library. Additionally, one can
+ input an array of filenames and have an array of Java objects returned.
+
+License Information:
+Our Parser is protected under the GPL V2 license.
+We chose this license since we want anyone to be able to use our software
+if they desire, but we don't want someone to incorporate it into a paid
+program and profit off of it. That is, we don't mind if people use our JSON
+parser for free open source software, but we wouldn't want someone using it
+in a paid program.
