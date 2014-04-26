@@ -40,7 +40,7 @@ Developement
 ----------
 The SparcerParser was developed by Phineas Schlossberg and Ashwin
 Sivaramakrishnan.
-The SparcerParser is protected under the GPL v3 License
+The SparcerParser is protected under the GPL v2 License
 
 Contact
 ----------
